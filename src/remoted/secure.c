@@ -74,7 +74,7 @@ void HandleSecure()
     int sock_client;
     int n_events = 0;
     char buffer[OS_MAXSTR + 1];
-    ssize_t recv_b;
+    int recv_b;
     struct sockaddr_in peer_info;
     memset(&peer_info, 0, sizeof(struct sockaddr_in));
     wnotify_t * notify = NULL;
@@ -471,6 +471,14 @@ static void HandleSecureMessage(char *buffer, int recv_b, struct sockaddr_in *pe
         }
 
         tmp_msg = buffer;
+    }
+
+    if (recv_b <= 0) {
+        mwarn("Received message is empty");
+        if (sock_client >= 0)
+            _close_sock(&keys, sock_client);
+        
+        return;
     }
 
     /* Decrypt the message */
